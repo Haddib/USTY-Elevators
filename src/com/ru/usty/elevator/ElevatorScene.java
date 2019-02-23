@@ -17,6 +17,8 @@ public class ElevatorScene {
 	//feel free to change this.  It will be changed during grading
 	public static final int VISUALIZATION_WAIT_TIME = 500;  //milliseconds
 
+	public static ElevatorScene instance;
+
 	private int numberOfFloors;
 	private int numberOfElevators;
 
@@ -25,7 +27,11 @@ public class ElevatorScene {
 									//implement differently
 									//if it suits you
 	ArrayList<Integer> exitedCount = null;
-	public static Semaphore exitedCountMutex;
+
+	public ArrayList<Elevator> elevators;
+	public ArrayList<Person> persons;
+	public ArrayList<Thread> elevatorThreads;
+	public Semaphore exitedCountMutex;
 
 	//Base function: definition must not change
 	//Necessary to add your code in this one
@@ -41,6 +47,18 @@ public class ElevatorScene {
 		 * If you can, tell any currently running
 		 * elevator threads to stop
 		 */
+		instance = this;
+		elevators = new ArrayList<>();
+		persons = new ArrayList<>();
+		elevatorThreads = new ArrayList<>();
+
+		for(int i = 0 ; i < numberOfElevators ; i++){
+			Elevator e = new Elevator(numberOfFloors);
+			elevators.add(e);
+			Thread et = new Thread(e);
+			elevatorThreads.add(et);
+			et.start();
+		}
 
 		this.numberOfFloors = numberOfFloors;
 		this.numberOfElevators = numberOfElevators;
@@ -62,6 +80,10 @@ public class ElevatorScene {
 		exitedCountMutex = new Semaphore(1);
 	}
 
+	public static ElevatorScene getInstance(){
+		return instance;
+	}
+
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public Thread addPerson(int sourceFloor, int destinationFloor) {
@@ -76,26 +98,29 @@ public class ElevatorScene {
 		 */
 
 		//dumb code, replace it!
+
+		Person person = new Person(sourceFloor, destinationFloor);
+		persons.add(person);
+		Thread personThread = new Thread(person);
+		personThread.start();
+
 		personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
-		return null;  //this means that the testSuite will not wait for the threads to finish
+
+		return personThread;  //this means that the testSuite will not wait for the threads to finish
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
 
-		//dumb code, replace it!
-		return 1;
+		int cf = elevators.get(elevator).currentFloor;
+		return cf;
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
 		
-		//dumb code, replace it!
-		switch(elevator) {
-		case 1: return 1;
-		case 2: return 4;
-		default: return 3;
-		}
+		int cp = elevators.get(elevator).passengerCount;
+		return cp;
 	}
 
 	//Base function: definition must not change, but add your code
