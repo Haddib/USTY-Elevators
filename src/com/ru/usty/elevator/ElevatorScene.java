@@ -28,10 +28,11 @@ public class ElevatorScene {
 									//if it suits you
 	ArrayList<Integer> exitedCount = null;
 
-	public ArrayList<Elevator> elevators;
-	public ArrayList<Person> persons;
-	public ArrayList<Thread> elevatorThreads;
+	public ArrayList<Elevator> elevators = null;
+	public ArrayList<Person> persons = null;
+	public ArrayList<Thread> elevatorThreads = null;
 	public Semaphore exitedCountMutex;
+	public Semaphore personCountSemaphore;
 
 	//Base function: definition must not change
 	//Necessary to add your code in this one
@@ -48,9 +49,32 @@ public class ElevatorScene {
 		 * elevator threads to stop
 		 */
 		instance = this;
-		elevators = new ArrayList<>();
-		persons = new ArrayList<>();
-		elevatorThreads = new ArrayList<>();
+
+		if(elevators == null){
+			elevators = new ArrayList<>();
+		}
+		else{
+			elevators.clear();
+		}
+		if(persons == null){
+			persons = new ArrayList<>();
+		}
+		else{
+			persons.clear();
+		}
+		if(elevatorThreads == null){
+			elevatorThreads = new ArrayList<>();
+		}
+		else{
+			for (Thread t : elevatorThreads) {
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			elevatorThreads.clear();
+		}
 
 		for(int i = 0 ; i < numberOfElevators ; i++){
 			Elevator e = new Elevator(numberOfFloors);
@@ -78,6 +102,8 @@ public class ElevatorScene {
 			this.exitedCount.add(0);
 		}
 		exitedCountMutex = new Semaphore(1);
+		personCountSemaphore = new Semaphore(1);
+
 	}
 
 	public static ElevatorScene getInstance(){
@@ -104,7 +130,14 @@ public class ElevatorScene {
 		Thread personThread = new Thread(person);
 		personThread.start();
 
-		personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
+		try {
+			personCountSemaphore.acquire();
+			personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
+			personCountSemaphore.release();
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		return personThread;  //this means that the testSuite will not wait for the threads to finish
 	}
@@ -169,14 +202,18 @@ public class ElevatorScene {
 	//but before it finishes its run.
 	public void personExitsAtFloor(int floor) {
 		try {
-			
 			exitedCountMutex.acquire();
 			exitedCount.set(floor, (exitedCount.get(floor) + 1));
 			exitedCountMutex.release();
 
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public void decrementPersonCount(int floor){
+		if(personCount.get(floor) > 0){
+			personCount.set(floor, personCount.get(floor) - 1);
 		}
 	}
 

@@ -78,7 +78,7 @@ public class Elevator implements Runnable {
                 }
             }
             try {
-                sleep(1);
+                sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

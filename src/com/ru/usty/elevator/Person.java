@@ -20,12 +20,17 @@ public class Person implements Runnable {
 
     public void enterElevator(Elevator elevator){
         try {
+            this.ES.personCountSemaphore.acquire();
             elevator.elevatorSemaphore.acquire();
+
             if(elevator.passengerCount < 6){
                 this.elevator = elevator.getInstance();
                 this.elevator.enterPassenger();
                 this.inElevator = true;
+                this.ES.decrementPersonCount(sourceFloor);
             }
+
+            this.ES.personCountSemaphore.release();
             elevator.elevatorSemaphore.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -36,7 +41,8 @@ public class Person implements Runnable {
         if(this.inElevator){
             this.elevator.exitPassenger();
             this.ES.personExitsAtFloor(destinationFloor);
-            this.ES.personCount.set(sourceFloor, ES.personCount.get(sourceFloor));
+            this.inElevator = false;
+
         }
     }
 
