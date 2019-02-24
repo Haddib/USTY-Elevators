@@ -17,22 +17,19 @@ public class ElevatorScene {
 	//feel free to change this.  It will be changed during grading
 	public static final int VISUALIZATION_WAIT_TIME = 500;  //milliseconds
 
-	public static ElevatorScene instance;
+	public static ElevatorScene instance; 				// Til að Elevator og Person geti kallað á föll í þessum klasa
 
 	private int numberOfFloors;
 	private int numberOfElevators;
 
-	ArrayList<Integer> personCount; //use if you want but
-									//throw away and
-									//implement differently
-									//if it suits you
-	ArrayList<Integer> exitedCount = null;
+	ArrayList<Integer> personCount; 					//Heldur utan um hversu margir eru að bíða á hverri hæð
+	ArrayList<Integer> exitedCount = null; 				//Heldur utan um hversu margir hafa farið út á hverri hæð
 
-	public ArrayList<Elevator> elevators = null;
-	public ArrayList<Person> persons = null;
-	public ArrayList<Thread> elevatorThreads = null;
-	public Semaphore exitedCountMutex;
-	public Semaphore personCountSemaphore;
+	public ArrayList<Elevator> elevators = null; 		//Listi af lyftur
+	public ArrayList<Person> persons = null;			//Listi af fólki
+	public ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
+	public Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
+	public Semaphore personCountSemaphore;				//Semaphore fyrir personCount
 
 	//Base function: definition must not change
 	//Necessary to add your code in this one
@@ -48,25 +45,27 @@ public class ElevatorScene {
 		 * If you can, tell any currently running
 		 * elevator threads to stop
 		 */
-		instance = this;
+		instance = this;								//instanse er þetta eintak af klasanum
 
-		if(elevators == null){
+		if(elevators == null){							//frumstilla elevators
 			elevators = new ArrayList<>();
 		}
 		else{
 			elevators.clear();
 		}
-		if(persons == null){
+
+		if(persons == null){							//frumstilla persons
 			persons = new ArrayList<>();
 		}
 		else{
 			persons.clear();
 		}
-		if(elevatorThreads == null){
+
+		if(elevatorThreads == null){					//frumstilla elevatorThreads
 			elevatorThreads = new ArrayList<>();
 		}
 		else{
-			for (Thread t : elevatorThreads) {
+			for (Thread t : elevatorThreads) {			//Ef einhverjir þræðir eru í gangi, joina þá.
 				try {
 					t.join();
 				} catch (InterruptedException e) {
@@ -76,7 +75,7 @@ public class ElevatorScene {
 			elevatorThreads.clear();
 		}
 
-		for(int i = 0 ; i < numberOfElevators ; i++){
+		for(int i = 0 ; i < numberOfElevators ; i++){	//fylla elevator of elevatorThreads af lyftum
 			Elevator e = new Elevator(numberOfFloors);
 			elevators.add(e);
 			Thread et = new Thread(e);
@@ -106,7 +105,7 @@ public class ElevatorScene {
 
 	}
 
-	public static ElevatorScene getInstance(){
+	public static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
 		return instance;
 	}
 
@@ -125,15 +124,15 @@ public class ElevatorScene {
 
 		//dumb code, replace it!
 
-		Person person = new Person(sourceFloor, destinationFloor);
+		Person person = new Person(sourceFloor, destinationFloor); //búa til nýja persónu og keyra hana á nýjum þræði
 		persons.add(person);
 		Thread personThread = new Thread(person);
 		personThread.start();
 
 		try {
-			personCountSemaphore.acquire();
+			personCountSemaphore.acquire(); 			//Fá leyfi til að breyta personCount
 			personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
-			personCountSemaphore.release();
+			personCountSemaphore.release();				//Búinn með personCount
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -144,16 +143,13 @@ public class ElevatorScene {
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
-
-		int cf = elevators.get(elevator).currentFloor;
-		return cf;
+		return elevators.get(elevator).currentFloor;
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
-		
-		int cp = elevators.get(elevator).passengerCount;
-		return cp;
+
+		return elevators.get(elevator).passengerCount;
 	}
 
 	//Base function: definition must not change, but add your code
@@ -226,6 +222,15 @@ public class ElevatorScene {
 		else {
 			return 0;
 		}
+	}
+
+	public boolean waitingPerson(){
+		for (int i = 0 ; i < personCount.size() ; i++) {
+			if(personCount.get(i) != 0){
+				return true;
+			}
+		}
+		return false;
 	}
 
 
