@@ -17,33 +17,33 @@ public class ElevatorScene {
 	//feel free to change this.  It will be changed during grading
 	public static final int VISUALIZATION_WAIT_TIME = 500;  //milliseconds
 
-	public static ElevatorScene instance; 				// Til að Elevator og Person geti kallað á föll í þessum klasa
+	private static ElevatorScene instance; 				// Til að Elevator og Person geti kallað á föll í þessum klasa
 
 	private int numberOfFloors;
 	private int numberOfElevators;
 
-	ArrayList<Integer> personCount; 					//Heldur utan um hversu margir eru að bíða á hverri hæð
-	ArrayList<Integer> exitedCount = null; 				//Heldur utan um hversu margir hafa farið út á hverri hæð
+	private ArrayList<Integer> personCount; 					//Heldur utan um hversu margir eru að bíða á hverri hæð
+	private ArrayList<Integer> exitedCount = null; 				//Heldur utan um hversu margir hafa farið út á hverri hæð
 
-	public ArrayList<Elevator> elevators = null; 		//Listi af lyftur
-	public ArrayList<Person> persons = null;			//Listi af fólki
-	public ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
-	public Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
-	public Semaphore personCountSemaphore;				//Semaphore fyrir personCount
+	ArrayList<Elevator> elevators = null; 		//Listi af lyftur
+	private ArrayList<Person> persons = null;			//Listi af fólki
+	private ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
+	private Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
+	Semaphore personCountSemaphore;				//Semaphore fyrir personCount
 
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
 
 		/**
-		 * Important to add code here to make new
-		 * threads that run your elevator-runnables
-		 * 
-		 * Also add any other code that initializes
-		 * your system for a new run
-		 * 
-		 * If you can, tell any currently running
-		 * elevator threads to stop
+		  Important to add code here to make new
+		  threads that run your elevator-runnables
+
+		  Also add any other code that initializes
+		  your system for a new run
+
+		  If you can, tell any currently running
+		  elevator threads to stop
 		 */
 		instance = this;								//instanse er þetta eintak af klasanum
 
@@ -83,16 +83,16 @@ public class ElevatorScene {
 			et.start();
 		}
 
-		this.numberOfFloors = numberOfFloors;
-		this.numberOfElevators = numberOfElevators;
+		setNumberOfFloors(numberOfFloors);
+		setNumberOfElevators(numberOfElevators);
 
-		personCount = new ArrayList<Integer>();
+		personCount = new ArrayList<>();
 		for(int i = 0; i < numberOfFloors; i++) {
 			this.personCount.add(0);
 		}
 
 		if(exitedCount == null) {
-			exitedCount = new ArrayList<Integer>();
+			exitedCount = new ArrayList<>();
 		}
 		else {
 			exitedCount.clear();
@@ -105,7 +105,7 @@ public class ElevatorScene {
 
 	}
 
-	public static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
+	static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
 		return instance;
 	}
 
@@ -143,13 +143,13 @@ public class ElevatorScene {
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
-		return elevators.get(elevator).currentFloor;
+		return elevators.get(elevator).getCurrentFloor();
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
 
-		return elevators.get(elevator).passengerCount;
+		return elevators.get(elevator).getPassengeCount();
 	}
 
 	//Base function: definition must not change, but add your code
@@ -164,7 +164,7 @@ public class ElevatorScene {
 	}
 
 	//Base function: definition must not change, but add your code if needed
-	public void setNumberOfFloors(int numberOfFloors) {
+	private void setNumberOfFloors(int numberOfFloors) {
 		this.numberOfFloors = numberOfFloors;
 	}
 
@@ -174,7 +174,7 @@ public class ElevatorScene {
 	}
 
 	//Base function: definition must not change, but add your code if needed
-	public void setNumberOfElevators(int numberOfElevators) {
+	private void setNumberOfElevators(int numberOfElevators) {
 		this.numberOfElevators = numberOfElevators;
 	}
 
@@ -196,7 +196,7 @@ public class ElevatorScene {
 	//let the system know that they have exited.
 	//Person calls it after being let off elevator
 	//but before it finishes its run.
-	public void personExitsAtFloor(int floor) {
+	void personExitsAtFloor(int floor) {
 		try {
 			exitedCountMutex.acquire();
 			exitedCount.set(floor, (exitedCount.get(floor) + 1));
@@ -207,7 +207,7 @@ public class ElevatorScene {
 		}
 	}
 
-	public void decrementPersonCount(int floor){
+	void decrementPersonCount(int floor){
 		if(personCount.get(floor) > 0){
 			personCount.set(floor, personCount.get(floor) - 1);
 		}
@@ -224,9 +224,9 @@ public class ElevatorScene {
 		}
 	}
 
-	public boolean waitingPerson(){
-		for (int i = 0 ; i < personCount.size() ; i++) {
-			if(personCount.get(i) != 0){
+	boolean waitingPerson(){
+		for (Integer integer : personCount) {
+			if (integer != 0) {
 				return true;
 			}
 		}
