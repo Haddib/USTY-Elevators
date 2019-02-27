@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c109ccb-1592-46cb-bf69-6f5be3308de4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ru/usty/elevator/Person.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ru/usty/elevator/Person.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,24 +15,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+            <state relative-caret-position="323">
+              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/TestSuite.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-799">
-              <caret line="119" column="13" lean-forward="true" selection-start-line="119" selection-start-column="13" selection-end-line="119" selection-end-column="13" />
-              <folding>
-                <element signature="e#2194#2202#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="119">
+              <caret line="29" column="24" selection-start-line="29" selection-start-column="24" selection-end-line="29" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -40,16 +37,15 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="145" selection-start-line="145" selection-end-line="145" />
+            <state relative-caret-position="867">
+              <caret line="115" column="9" lean-forward="true" selection-start-line="115" selection-start-column="9" selection-end-line="115" selection-end-column="9" />
               <folding>
-                <element signature="e#1928#1929#0" expanded="true" />
-                <element signature="e#1943#1944#0" expanded="true" />
-                <element signature="e#4326#4327#0" expanded="true" />
-                <element signature="e#4763#4764#0" expanded="true" />
-                <element signature="e#4935#4936#0" expanded="true" />
-                <element signature="e#5078#5079#0" expanded="true" />
-                <element signature="e#5262#5263#0" expanded="true" />
+                <element signature="e#3742#3743#0" expanded="true" />
+                <element signature="e#3820#3821#0" expanded="true" />
+                <element signature="e#5441#5442#0" expanded="true" />
+                <element signature="e#5613#5614#0" expanded="true" />
+                <element signature="e#5756#5757#0" expanded="true" />
+                <element signature="e#5940#5941#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -58,16 +54,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
+            <state relative-caret-position="537">
+              <caret line="103" selection-start-line="103" selection-end-line="103" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#708#709#0" expanded="true" />
-                <element signature="e#739#740#0" expanded="true" />
-                <element signature="e#820#821#0" expanded="true" />
-                <element signature="e#854#855#0" expanded="true" />
-                <element signature="e#977#978#0" expanded="true" />
-                <element signature="e#1013#1014#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -76,8 +66,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/Person.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="535">
-              <caret line="63" column="38" selection-start-line="63" selection-start-column="38" selection-end-line="63" selection-end-column="38" />
+            <state relative-caret-position="1054">
+              <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -99,10 +89,10 @@
       <list>
         <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/Elevator.java" />
         <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/Person.java" />
-        <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java" />
-        <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java" />
         <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/Person.java" />
         <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java" />
+        <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java" />
+        <option value="$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java" />
       </list>
     </option>
   </component>
@@ -120,6 +110,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -150,11 +141,10 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551015992679" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551204922057" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -217,7 +207,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17270789" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17430703" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -245,87 +235,59 @@
       <window_info anchor="right" id="Palette&#9;" order="7" />
     </layout>
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java</url>
-          <line>15</line>
-          <properties />
-          <option name="timeStamp" value="41" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java</url>
-          <line>17</line>
-          <properties />
-          <option name="timeStamp" value="42" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/Elevator.java" />
     <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/Person.java" />
     <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/ElevatorGraphics.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
+        <state relative-caret-position="190">
           <caret line="73" selection-start-line="73" selection-end-line="73" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/TestSuite.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-799">
-          <caret line="119" column="13" lean-forward="true" selection-start-line="119" selection-start-column="13" selection-end-line="119" selection-end-column="13" />
-          <folding>
-            <element signature="e#2194#2202#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#708#709#0" expanded="true" />
-            <element signature="e#739#740#0" expanded="true" />
-            <element signature="e#820#821#0" expanded="true" />
-            <element signature="e#854#855#0" expanded="true" />
-            <element signature="e#977#978#0" expanded="true" />
-            <element signature="e#1013#1014#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/Person.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="63" column="38" selection-start-line="63" selection-start-column="38" selection-end-line="63" selection-end-column="38" />
+        <state relative-caret-position="1054">
+          <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java">
+    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/Elevator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="145" selection-start-line="145" selection-end-line="145" />
+        <state relative-caret-position="537">
+          <caret line="103" selection-start-line="103" selection-end-line="103" />
           <folding>
-            <element signature="e#1928#1929#0" expanded="true" />
-            <element signature="e#1943#1944#0" expanded="true" />
-            <element signature="e#4326#4327#0" expanded="true" />
-            <element signature="e#4763#4764#0" expanded="true" />
-            <element signature="e#4935#4936#0" expanded="true" />
-            <element signature="e#5078#5079#0" expanded="true" />
-            <element signature="e#5262#5263#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorMainProgram.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+        <state relative-caret-position="323">
+          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/ElevatorScene.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="867">
+          <caret line="115" column="9" lean-forward="true" selection-start-line="115" selection-start-column="9" selection-end-line="115" selection-end-column="9" />
+          <folding>
+            <element signature="e#3742#3743#0" expanded="true" />
+            <element signature="e#3820#3821#0" expanded="true" />
+            <element signature="e#5441#5442#0" expanded="true" />
+            <element signature="e#5613#5614#0" expanded="true" />
+            <element signature="e#5756#5757#0" expanded="true" />
+            <element signature="e#5940#5941#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ru/usty/elevator/visualization/TestSuite.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="29" column="24" selection-start-line="29" selection-start-column="24" selection-end-line="29" selection-end-column="24" />
         </state>
       </provider>
     </entry>

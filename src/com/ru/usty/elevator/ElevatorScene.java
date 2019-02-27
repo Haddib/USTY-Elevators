@@ -30,7 +30,8 @@ public class ElevatorScene {
 	private ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
 	private Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
 	Semaphore personCountSemaphore;				//Semaphore fyrir personCount
-
+	Semaphore elevatorFloorSemaphore;
+	Semaphore elevatorListSemaphore;
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
@@ -47,12 +48,32 @@ public class ElevatorScene {
 		 */
 		instance = this;								//instanse er þetta eintak af klasanum
 
-		if(elevators == null){							//frumstilla elevators
-			elevators = new ArrayList<>();
+		KillThreads();
+
+		exitedCountMutex = new Semaphore(1);
+		personCountSemaphore = new Semaphore(1);
+		elevatorFloorSemaphore = new Semaphore(1);
+		elevatorListSemaphore = new Semaphore(1);
+
+		try {
+			elevatorListSemaphore.acquire();
+
+			for(int i = 0 ; i < numberOfElevators ; i++){	//fylla elevator of elevatorThreads af lyftum
+				Elevator e = new Elevator(numberOfFloors);
+				elevators.add(e);
+				Thread et = new Thread(e);
+				elevatorThreads.add(et);
+				et.start();
+			}
+
+			elevatorListSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		else{
-			elevators.clear();
-		}
+
+
+		setNumberOfFloors(numberOfFloors);
+		setNumberOfElevators(numberOfElevators);
 
 		if(persons == null){							//frumstilla persons
 			persons = new ArrayList<>();
@@ -61,48 +82,38 @@ public class ElevatorScene {
 			persons.clear();
 		}
 
-		if(elevatorThreads == null){					//frumstilla elevatorThreads
-			elevatorThreads = new ArrayList<>();
-		}
-		else{
-			for (Thread t : elevatorThreads) {			//Ef einhverjir þræðir eru í gangi, joina þá.
-				try {
-					t.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		try {
+			personCountSemaphore.acquire();
+			if(personCount == null){
+				personCount = new ArrayList<>();
 			}
-			elevatorThreads.clear();
+			else{
+				personCount.clear();
+			}
+			for(int i = 0; i < numberOfFloors; i++) {
+				this.personCount.add(0);
+			}
+			personCountSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
-		for(int i = 0 ; i < numberOfElevators ; i++){	//fylla elevator of elevatorThreads af lyftum
-			Elevator e = new Elevator(numberOfFloors);
-			elevators.add(e);
-			Thread et = new Thread(e);
-			elevatorThreads.add(et);
-			et.start();
-		}
 
-		setNumberOfFloors(numberOfFloors);
-		setNumberOfElevators(numberOfElevators);
-
-		personCount = new ArrayList<>();
-		for(int i = 0; i < numberOfFloors; i++) {
-			this.personCount.add(0);
+		try {
+			exitedCountMutex.acquire();
+			if(exitedCount == null) {
+				exitedCount = new ArrayList<>();
+			}
+			else {
+				exitedCount.clear();
+			}
+			for(int i = 0; i < getNumberOfFloors(); i++) {
+				this.exitedCount.add(0);
+			}
+			exitedCountMutex.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-
-		if(exitedCount == null) {
-			exitedCount = new ArrayList<>();
-		}
-		else {
-			exitedCount.clear();
-		}
-		for(int i = 0; i < getNumberOfFloors(); i++) {
-			this.exitedCount.add(0);
-		}
-		exitedCountMutex = new Semaphore(1);
-		personCountSemaphore = new Semaphore(1);
-
 	}
 
 	static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
@@ -143,13 +154,31 @@ public class ElevatorScene {
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
-		return elevators.get(elevator).getCurrentFloor();
+		try {
+			elevatorListSemaphore.acquire();
+			elevatorFloorSemaphore.acquire();
+			int floor = elevators.get(elevator).getCurrentFloor();
+			elevatorFloorSemaphore.release();
+			elevatorListSemaphore.release();
+			return floor;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
+		try {
+			personCountSemaphore.acquire();
+			int peopleCount = elevators.get(elevator).getPassengeCount();
+			personCountSemaphore.release();
 
-		return elevators.get(elevator).getPassengeCount();
+			return peopleCount;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
 	//Base function: definition must not change, but add your code
@@ -231,6 +260,46 @@ public class ElevatorScene {
 			}
 		}
 		return false;
+	}
+
+	public void KillThreads(){
+		if(elevatorListSemaphore != null){
+			try {
+				elevatorListSemaphore.acquire();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if(elevators == null){							//frumstilla elevators
+			elevators = new ArrayList<>();
+		}
+		else{
+			for (Elevator el: elevators) {
+				el.keepGoing = false;
+			}
+			elevators.clear();
+		}
+
+		if(elevatorThreads == null){					//frumstilla elevatorThreads
+			elevatorThreads = new ArrayList<>();
+		}
+		else{
+			for (Thread t : elevatorThreads) {			//Ef einhverjir þræðir eru í gangi, joina þá.
+				if(t.isAlive()) {
+					try {
+						t.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			elevatorThreads.clear();
+		}
+
+		if(elevatorListSemaphore != null){
+			elevatorListSemaphore.release();
+		}
 	}
 
 
