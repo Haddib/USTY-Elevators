@@ -17,49 +17,107 @@ public class ElevatorScene {
 	//feel free to change this.  It will be changed during grading
 	public static final int VISUALIZATION_WAIT_TIME = 500;  //milliseconds
 
+	private static ElevatorScene instance; 				// Til að Elevator og Person geti kallað á föll í þessum klasa
+
 	private int numberOfFloors;
 	private int numberOfElevators;
 
-	ArrayList<Integer> personCount; //use if you want but
-									//throw away and
-									//implement differently
-									//if it suits you
-	ArrayList<Integer> exitedCount = null;
-	public static Semaphore exitedCountMutex;
+	private ArrayList<Integer> personCount; 					//Heldur utan um hversu margir eru að bíða á hverri hæð
+	private ArrayList<Integer> exitedCount = null; 				//Heldur utan um hversu margir hafa farið út á hverri hæð
 
+	ArrayList<Elevator> elevators = null; 		//Listi af lyftur
+	private ArrayList<Person> persons = null;			//Listi af fólki
+	private ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
+	private Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
+	Semaphore personCountSemaphore;				//Semaphore fyrir personCount
+	Semaphore elevatorFloorSemaphore;
+	Semaphore elevatorListSemaphore;
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
 
 		/**
-		 * Important to add code here to make new
-		 * threads that run your elevator-runnables
-		 * 
-		 * Also add any other code that initializes
-		 * your system for a new run
-		 * 
-		 * If you can, tell any currently running
-		 * elevator threads to stop
+		  Important to add code here to make new
+		  threads that run your elevator-runnables
+
+		  Also add any other code that initializes
+		  your system for a new run
+
+		  If you can, tell any currently running
+		  elevator threads to stop
 		 */
+		instance = this;								//instanse er þetta eintak af klasanum
 
-		this.numberOfFloors = numberOfFloors;
-		this.numberOfElevators = numberOfElevators;
+		KillThreads();
 
-		personCount = new ArrayList<Integer>();
-		for(int i = 0; i < numberOfFloors; i++) {
-			this.personCount.add(0);
-		}
-
-		if(exitedCount == null) {
-			exitedCount = new ArrayList<Integer>();
-		}
-		else {
-			exitedCount.clear();
-		}
-		for(int i = 0; i < getNumberOfFloors(); i++) {
-			this.exitedCount.add(0);
-		}
 		exitedCountMutex = new Semaphore(1);
+		personCountSemaphore = new Semaphore(1);
+		elevatorFloorSemaphore = new Semaphore(1);
+		elevatorListSemaphore = new Semaphore(1);
+
+		try {
+			elevatorListSemaphore.acquire();
+
+			for(int i = 0 ; i < numberOfElevators ; i++){	//fylla elevator of elevatorThreads af lyftum
+				Elevator e = new Elevator(numberOfFloors);
+				elevators.add(e);
+				Thread et = new Thread(e);
+				elevatorThreads.add(et);
+				et.start();
+			}
+
+			elevatorListSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+
+		setNumberOfFloors(numberOfFloors);
+		setNumberOfElevators(numberOfElevators);
+
+		if(persons == null){							//frumstilla persons
+			persons = new ArrayList<>();
+		}
+		else{
+			persons.clear();
+		}
+
+		try {
+			personCountSemaphore.acquire();
+			if(personCount == null){
+				personCount = new ArrayList<>();
+			}
+			else{
+				personCount.clear();
+			}
+			for(int i = 0; i < numberOfFloors; i++) {
+				this.personCount.add(0);
+			}
+			personCountSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+
+		try {
+			exitedCountMutex.acquire();
+			if(exitedCount == null) {
+				exitedCount = new ArrayList<>();
+			}
+			else {
+				exitedCount.clear();
+			}
+			for(int i = 0; i < getNumberOfFloors(); i++) {
+				this.exitedCount.add(0);
+			}
+			exitedCountMutex.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
+		return instance;
 	}
 
 	//Base function: definition must not change
@@ -76,25 +134,50 @@ public class ElevatorScene {
 		 */
 
 		//dumb code, replace it!
-		personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
-		return null;  //this means that the testSuite will not wait for the threads to finish
+
+		Person person = new Person(sourceFloor, destinationFloor); //búa til nýja persónu og keyra hana á nýjum þræði
+		persons.add(person);
+		Thread personThread = new Thread(person);
+		personThread.start();
+
+		try {
+			personCountSemaphore.acquire(); 			//Fá leyfi til að breyta personCount
+			personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
+			personCountSemaphore.release();				//Búinn með personCount
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return personThread;  //this means that the testSuite will not wait for the threads to finish
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
-
-		//dumb code, replace it!
-		return 1;
+		try {
+			elevatorListSemaphore.acquire();
+			elevatorFloorSemaphore.acquire();
+			int floor = elevators.get(elevator).getCurrentFloor();
+			elevatorFloorSemaphore.release();
+			elevatorListSemaphore.release();
+			return floor;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
-		
-		//dumb code, replace it!
-		switch(elevator) {
-		case 1: return 1;
-		case 2: return 4;
-		default: return 3;
+		try {
+			personCountSemaphore.acquire();
+			int peopleCount = elevators.get(elevator).getPassengeCount();
+			personCountSemaphore.release();
+
+			return peopleCount;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return 0;
 		}
 	}
 
@@ -110,7 +193,7 @@ public class ElevatorScene {
 	}
 
 	//Base function: definition must not change, but add your code if needed
-	public void setNumberOfFloors(int numberOfFloors) {
+	private void setNumberOfFloors(int numberOfFloors) {
 		this.numberOfFloors = numberOfFloors;
 	}
 
@@ -120,7 +203,7 @@ public class ElevatorScene {
 	}
 
 	//Base function: definition must not change, but add your code if needed
-	public void setNumberOfElevators(int numberOfElevators) {
+	private void setNumberOfElevators(int numberOfElevators) {
 		this.numberOfElevators = numberOfElevators;
 	}
 
@@ -142,16 +225,20 @@ public class ElevatorScene {
 	//let the system know that they have exited.
 	//Person calls it after being let off elevator
 	//but before it finishes its run.
-	public void personExitsAtFloor(int floor) {
+	void personExitsAtFloor(int floor) {
 		try {
-			
 			exitedCountMutex.acquire();
 			exitedCount.set(floor, (exitedCount.get(floor) + 1));
 			exitedCountMutex.release();
 
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	void decrementPersonCount(int floor){
+		if(personCount.get(floor) > 0){
+			personCount.set(floor, personCount.get(floor) - 1);
 		}
 	}
 
@@ -163,6 +250,55 @@ public class ElevatorScene {
 		}
 		else {
 			return 0;
+		}
+	}
+
+	boolean waitingPerson(){
+		for (Integer integer : personCount) {
+			if (integer != 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void KillThreads(){
+		if(elevatorListSemaphore != null){
+			try {
+				elevatorListSemaphore.acquire();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if(elevators == null){							//frumstilla elevators
+			elevators = new ArrayList<>();
+		}
+		else{
+			for (Elevator el: elevators) {
+				el.keepGoing = false;
+			}
+			elevators.clear();
+		}
+
+		if(elevatorThreads == null){					//frumstilla elevatorThreads
+			elevatorThreads = new ArrayList<>();
+		}
+		else{
+			for (Thread t : elevatorThreads) {			//Ef einhverjir þræðir eru í gangi, joina þá.
+				if(t.isAlive()) {
+					try {
+						t.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			elevatorThreads.clear();
+		}
+
+		if(elevatorListSemaphore != null){
+			elevatorListSemaphore.release();
 		}
 	}
 
