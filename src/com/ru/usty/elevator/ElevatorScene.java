@@ -29,9 +29,9 @@ public class ElevatorScene {
 	private ArrayList<Person> persons = null;			//Listi af fólki
 	private ArrayList<Thread> elevatorThreads = null;	//Listi af lyftuþráðunum
 	private Semaphore exitedCountMutex;					//Semaphore fyrir exitedCount
-	Semaphore personCountSemaphore;				//Semaphore fyrir personCount
-	Semaphore elevatorFloorSemaphore;
-	Semaphore elevatorListSemaphore;
+	private Semaphore personCountSemaphore;				//Semaphore fyrir personCount
+	private Semaphore elevatorFloorSemaphore;
+	private Semaphore elevatorListSemaphore;
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
@@ -53,13 +53,19 @@ public class ElevatorScene {
 		exitedCountMutex = new Semaphore(1);
 		personCountSemaphore = new Semaphore(1);
 		elevatorFloorSemaphore = new Semaphore(1);
-		elevatorListSemaphore = new Semaphore(1);
+		elevatorListSemaphore = new Semaphore(2);
+
+
 
 		try {
 			elevatorListSemaphore.acquire();
 
 			for(int i = 0 ; i < numberOfElevators ; i++){	//fylla elevator of elevatorThreads af lyftum
-				Elevator e = new Elevator(numberOfFloors);
+				int floor = 0;
+				if(i < numberOfFloors){
+					floor = i;
+				}
+				Elevator e = new Elevator(numberOfFloors, floor);
 				elevators.add(e);
 				Thread et = new Thread(e);
 				elevatorThreads.add(et);
@@ -114,6 +120,8 @@ public class ElevatorScene {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+
+		//WaitForTheEnd();
 	}
 
 	static ElevatorScene getInstance(){			//þarf að vera static svo að aðrir klasar hafi aðgang
@@ -154,37 +162,62 @@ public class ElevatorScene {
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
+		/*int floor = 0;
+		if(elevators != null){
+			if(elevator <= elevators.size()){
+				floor = elevators.get(elevator).getCurrentFloor();
+			}
+		}*/
+
+
 		try {
 			elevatorListSemaphore.acquire();
 			elevatorFloorSemaphore.acquire();
-			int floor = elevators.get(elevator).getCurrentFloor();
+			int floor = 0;
+			if(elevators != null){
+				if(elevator < elevators.size()){
+					 floor = elevators.get(elevator).getCurrentFloor();
+				}
+			}
 			elevatorFloorSemaphore.release();
 			elevatorListSemaphore.release();
 			return floor;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			return 0;
 		}
+		return 0;
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
-		try {
-			personCountSemaphore.acquire();
-			int peopleCount = elevators.get(elevator).getPassengeCount();
-			personCountSemaphore.release();
+		/*int peopleCount = 0;
+		if(elevators != null){
+			peopleCount = elevators.get(elevator).getPassengerCount();
+		}
+		return peopleCount;*/
 
-			return peopleCount;
+		try {
+			elevatorListSemaphore.acquire();
+			int count = 0;
+			if(elevators != null){
+				if(elevator < elevators.size()){
+					count = elevators.get(elevator).getPassengerCount();
+				}
+			}
+			elevatorListSemaphore.release();
+			return count;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			return 0;
 		}
+		return 0;
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleWaitingAtFloor(int floor) {
-
-		return personCount.get(floor);
+		if(personCount != null){
+			return personCount.get(floor);
+		}
+		return 0;
 	}
 
 	//Base function: definition must not change, but add your code if needed
@@ -237,9 +270,16 @@ public class ElevatorScene {
 	}
 
 	void decrementPersonCount(int floor){
-		if(personCount.get(floor) > 0){
-			personCount.set(floor, personCount.get(floor) - 1);
+		try {
+			personCountSemaphore.acquire();
+			if(personCount.get(floor) > 0){
+				personCount.set(floor, personCount.get(floor) - 1);
+			}
+			personCountSemaphore.release();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	//Base function: no need to change, just for visualization
@@ -254,15 +294,18 @@ public class ElevatorScene {
 	}
 
 	boolean waitingPerson(){
-		for (Integer integer : personCount) {
-			if (integer != 0) {
-				return true;
+		if(personCount != null){
+			for (Integer integer : personCount) {
+				if (integer != 0) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	public void KillThreads(){
+
+	private void KillThreads(){
 		if(elevatorListSemaphore != null){
 			try {
 				elevatorListSemaphore.acquire();
@@ -271,7 +314,7 @@ public class ElevatorScene {
 			}
 		}
 
-		if(elevators == null){							//frumstilla elevators
+		if(elevators == null) {                            //frumstilla elevators
 			elevators = new ArrayList<>();
 		}
 		else{
@@ -281,7 +324,7 @@ public class ElevatorScene {
 			elevators.clear();
 		}
 
-		if(elevatorThreads == null){					//frumstilla elevatorThreads
+		if(elevatorThreads == null){
 			elevatorThreads = new ArrayList<>();
 		}
 		else{
@@ -301,6 +344,5 @@ public class ElevatorScene {
 			elevatorListSemaphore.release();
 		}
 	}
-
 
 }

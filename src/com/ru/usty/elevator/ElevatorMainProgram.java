@@ -12,15 +12,17 @@ public class ElevatorMainProgram {
 /***EXPERIMENT HERE BUT THIS WILL BE CHANGED DURING GRADING***/
 
 
-	//		Thread.sleep(1000);
+			/*Thread.sleep(1000);
 
-			//TestSuite.runTest(0);
+			TestSuite.runTest(5);
 
-			//Thread.sleep(2000);
+			Thread.sleep(2000);*/
 
 
 			for(int i = 0; i <= 9; i++) {
+				System.out.println("RUNNING TEST " + i);
 				TestSuite.runTest(i);
+				System.out.println("TEST " + i + " FINISHED!");
 				Thread.sleep(2000);
 			}
 
