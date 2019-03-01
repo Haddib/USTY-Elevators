@@ -2,69 +2,98 @@ package com.ru.usty.elevator;
 
 public class Person implements Runnable {
     private int sourceFloor, destinationFloor;
-    private Elevator elevator;                                       //lyftan sem þessu farþegi er í
+    private Elevator elevator;                          //lyftan sem þessi farþegi er í
     private boolean inElevator;
     private ElevatorScene ES;
 
     Person(int sourceFloor, int destinationFloor){
         this.sourceFloor = sourceFloor;
         this.destinationFloor = destinationFloor;
-        this.elevator = null;                                       //farþegi byrjar ekki í lyftu
+        this.elevator = null;
         this.ES = ElevatorScene.getInstance();
         this.inElevator = false;
     }
 
+    //Reyna að fara inn í lyftu
     private void enterElevator(Elevator elevator){
+
+        //fá leyfi til að nota lyftuna
         try {
-            //this.ES.personCountSemaphore.acquire();                 //fá leyfi til að nota personCount í ElevatorScene
-            elevator.elevatorSemaphore.acquire();                   //fá leyfi til að nota lyftuna
-            //System.out.println("Person " + Thread.currentThread().getId() + " acquiring " + elevator.elevatorSemaphore.toString());
+            elevator.elevatorSemaphore.acquire();
 
+            //ef lyftan er ekki full
+            if(elevator.getPassengerCount() < 6){
 
-            if(elevator.getPassengerCount() < 6){                   //ef lyftan er ekki full
-                this.elevator = elevator;                           //vista þessa lyftu í klasanum
-                this.elevator.enterPassenger();                     //láta lyftuna vita að farþegi er kominn inn.
+                //vista að þessi persóna er í þessari lyftu
+                this.elevator = elevator;
+
+                //láta lyftuna vita að ég er kominn inn
+                this.elevator.enterPassenger();
                 this.inElevator = true;
-                this.ES.decrementPersonCount(sourceFloor);          //láta ElevatorScene vita að þessi persóna er ekki lengur að bíða á þessari hæð
+
+                //láta ElevatorScene vita að ég er ekki lengir að bíða á þessari hæð
+                this.ES.decrementPersonCount(sourceFloor);
             }
 
-            //this.ES.personCountSemaphore.release();                 //búinn með personCount
-            elevator.elevatorSemaphore.release();                   //búinn með lyftuna
-            //System.out.println("Person " + Thread.currentThread().getId() + " releasing " + elevator.elevatorSemaphore.toString());
+            elevator.elevatorSemaphore.release();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    //reyna að fara úr lyftunni
     private void exitElevator(){
-        if(this.inElevator){                                        //ef þessi persóna er í lyftu
-            this.elevator.exitPassenger();                          //láta lyftuna vita að farþegi fór út
-            this.ES.personExitsAtFloor(destinationFloor);           //láta ElevatorScene á hvaða hæð þessi persóna fór út
-            this.inElevator = false;
+        if(this.inElevator){
 
+            //láta lyftuna vita að farþegi fór út
+            this.elevator.exitPassenger();
+
+            //láta ElevatorScene á hvaða hæð þessi persóna fór út
+            this.ES.personExitsAtFloor(destinationFloor);
+            this.inElevator = false;
         }
     }
 
+    //bíða eftir að lyftan sem ég er í fari á hæðina sem ég vil fara á
     private void waitForFloor(){
-        while(this.inElevator){                                     //ef þessi per´sona er í lyftu
+
+        //tjekka alltaf á meðan ég er í lyftunni
+        while(this.inElevator){
+
+            //fá leyfi til að lesa úr lyftunni
             try {
-                this.elevator.elevatorSemaphore.acquire();          //fá leyfi til að nota lyftuna
-                if(this.elevator.getCurrentFloor() == destinationFloor){ //ef lyftan er á éttri hæð
-                    this.exitElevator();                            //förum úr lyftunni
+                this.elevator.elevatorSemaphore.acquire();
+
+                //er lyftan komin á rétta hæð?
+                if(this.elevator.getCurrentFloor() == destinationFloor){
+
+                    //ef svo, förum úr henni
+                    this.exitElevator();
                 }
-                this.elevator.elevatorSemaphore.release();          //búinn með lyftuna
+
+                this.elevator.elevatorSemaphore.release();
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    //bíða eftir því að lyfta kommi á mína hæð
     private void waitForElevator(){
-        while(!this.inElevator){                                    //ef þessi farþegi er ekki í lyftunni
-            for (Elevator e : ES.elevators) {                       //tjekkum hvort að einhver lyfta sé á þessari hæð
+
+        //á meðan ég er ekki í lyftu
+        while(!this.inElevator){
+            for (Elevator e : ES.elevators) {
+
+                //tjekkum hvort að einhver lyfta sé á minni hæð sem er ekki full
                 if(e.getCurrentFloor() == sourceFloor && e.getPassengerCount() < 6){
-                    enterElevator(e);                               //ef svo, förum í hana
+
+                    //reynum að fara í lyftuna
+                    enterElevator(e);
+
+                    //þurfum ekki að tjekka á fleiri lyftum.
                     break;
                 }
             }
@@ -73,7 +102,7 @@ public class Person implements Runnable {
 
     @Override
     public void run() {
-        waitForElevator();                                          //bíða eftir lyfti
-        waitForFloor();                                             //bíða eftir að lyftan kemst á rétta hæð
+        waitForElevator();
+        waitForFloor();
     }
 }

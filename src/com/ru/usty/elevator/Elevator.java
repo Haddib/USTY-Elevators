@@ -1,6 +1,5 @@
 package com.ru.usty.elevator;
 
-import java.io.Console;
 import java.util.concurrent.Semaphore;
 
 import static java.lang.Thread.sleep;
@@ -24,10 +23,6 @@ public class Elevator implements Runnable {
         keepGoing = true;
     }
 
-    /*Elevator getInstance(){                   //Instance til að person geti kallað á þessa lyftu.
-        return this;
-    }*/
-
     int getCurrentFloor(){
         return currentFloor;
     }
@@ -36,9 +31,9 @@ public class Elevator implements Runnable {
         return passengerCount;
     }
 
-    private void moveUp(){                                   //Fara upp um eina hæð, nema lyftan sé á efstu hæð
+    //Fara upp um eina hæð, nema lyftan sé á efstu hæð
+    private void moveUp(){
         if(currentFloor < numberOfFloors - 1){
-            //System.out.println(Thread.currentThread().getName() + " going up");
             currentFloor++;
         }
         else{
@@ -47,9 +42,9 @@ public class Elevator implements Runnable {
         }
     }
 
-    private void moveDown(){                                 //Fara niður eina hæð, nema lyftan sé á neðstu hæð
+    //Fara niður eina hæð, nema lyftan sé á neðstu hæð
+    private void moveDown(){
         if(currentFloor > 0){
-            //System.out.println(Thread.currentThread().getName() + " going down");
             currentFloor--;
         }
         else{
@@ -58,12 +53,14 @@ public class Elevator implements Runnable {
         }
     }
 
+    //minnka farþegafjöldann um 1
     void exitPassenger(){
         if(passengerCount > 0){
             passengerCount--;
         }
     }
 
+    //hækka farþegafjöldann um 1
     void enterPassenger(){
         if(passengerCount < 6){
             passengerCount++;
@@ -74,40 +71,39 @@ public class Elevator implements Runnable {
     @Override
     public void run() {
         while (keepGoing) {
-            if (ES.waitingPerson() || passengerCount == 6 || (ES.getNumberOfPeopleWaitingAtFloor(currentFloor) == 0)) { //Ef lyftan er full EÐA ef engin er að bíða á þessari hæð
+
+            //ef einhver er að bíða á einhverri hæð eða ef lyftan er full eða ef enginn er á þessari hæð
+            if (ES.waitingPerson() || passengerCount == 6 || (ES.getNumberOfPeopleWaitingAtFloor(currentFloor) == 0)) {
+
+                //fá leyfi til að nota lyftuna
                 try {
-                    this.elevatorSemaphore.acquire();               //fá leyfi til að nota lyftuna
-                    //System.out.println("Elevator " + Thread.currentThread().getId() + " acquiring " + this.elevatorSemaphore.toString());
+                    this.elevatorSemaphore.acquire();
                     loop = 0;
-                    if (goingUp) {                                    //fara upp eða niður um eina hæð
+
+                    //fara upp eða niður um eina hæð
+                    if (goingUp) {
                         moveUp();
                         this.elevatorSemaphore.release();
                     } else {
                         moveDown();
                         this.elevatorSemaphore.release();
                     }
-                    //System.out.println("Elevator " + Thread.currentThread().getId() + " releasing " + this.elevatorSemaphore.toString());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
+            //bíða í 500ms
             try {
-                sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);       //ef lyftan er ekki full eða ef einhver er að bíða á þessari hæð. Bíðum 500ms
+                sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
                 loop++;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            //System.out.println("Elevator " + Thread.currentThread().getId() + " loop: " + loop + " passengers: " + passengerCount);
-            System.out.println("Passengers left on floor " + currentFloor + ": " + ES.getNumberOfPeopleWaitingAtFloor(currentFloor));
-
-            if(!ES.waitingPerson()){
-                System.out.println("No one is waiting anywhere!");
-            }
-
+            //ef enginn er að bíða neinstaðar og engin hefur beðið á neinni hæð í 10 * 500ms. Hættum keyrslu
             if((loop > 10 && !ES.waitingPerson() && passengerCount == 0)){
                 keepGoing = false;
-                System.out.println(Thread.currentThread().getName() + " quitting");
             }
         }
     }
